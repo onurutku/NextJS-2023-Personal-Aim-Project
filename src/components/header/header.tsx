@@ -13,12 +13,14 @@ export default function Header() {
   //!UseEffect is a changedetection, if you want to check for updates for your variables when an event triggered, then you need to put your variable inside the effect hook
   useEffect(() => {
     setUser(JSON.parse(sessionStorage.getItem("user")!));
-  });
+  }, []);
   return (
     <>
       <nav className="navbar bg-body-tertiary">
         <div className="container-fluid">
-          <a className="navbar-brand">Navbar</a>
+          <Link className="navbar-brand" href="/">
+            Next-OUT
+          </Link>
           <form className="d-flex" role="search">
             {user ? (
               <div>
