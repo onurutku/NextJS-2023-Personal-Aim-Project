@@ -1,19 +1,16 @@
 "use client";
-import User from "@/models/register.model";
+import { GlobalContext } from "@/contexts";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useContext } from "react";
 
 export default function Header() {
+  const { user, setUser } = useContext(GlobalContext);
   const pathName: string = usePathname();
-  const [user, setUser] = useState<User | null>(null);
   const logout = () => {
     sessionStorage.removeItem("user");
+    setUser(null);
   };
-  //!UseEffect is a changedetection, if you want to check for updates for your variables when an event triggered, then you need to put your variable inside the effect hook
-  useEffect(() => {
-    setUser(JSON.parse(sessionStorage.getItem("user")!));
-  }, []);
   return (
     <>
       <nav className="navbar bg-body-tertiary">

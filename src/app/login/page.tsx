@@ -1,12 +1,14 @@
 "use client";
-import { FormEvent, useState } from "react";
+import { useState, useContext } from "react";
 import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 import User from "@/models/register.model";
+import { GlobalContext } from "@/contexts";
 
 export default function Login() {
-  const [email, setEmail] = useState<any>("");
-  const [password, setPassword] = useState<any>("");
+  const [email, setEmail] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const { user, setUser } = useContext(GlobalContext);
   const router = useRouter();
 
   const checkUser = async (user: User) => {
@@ -16,7 +18,13 @@ export default function Login() {
       (element: User) =>
         element.email === user.email && element.password === user.password
     );
+    setUserToMemory(matched);
     return matched;
+  };
+  const setUserToMemory = (matched: User | undefined) => {
+    document.cookie = `auth=${JSON.stringify(matched)}`;
+    sessionStorage.setItem("user", JSON.stringify(matched));
+    setUser(matched);
   };
   const handleSubmit = async (event: any) => {
     event.preventDefault();
@@ -39,7 +47,7 @@ export default function Login() {
     <>
       {/* imported style page usage*/}
       <div className={styles.main}>
-        <h1 className="fw-bold mb-5">Sign Up</h1>
+        <h1 className="fw-bold mb-5">Login</h1>
         <div className="p-5 rounded shadow" style={{ width: "35rem" }}>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">

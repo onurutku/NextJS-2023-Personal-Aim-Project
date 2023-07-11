@@ -1,0 +1,15 @@
+"use client";
+import { createContext, useState } from "react";
+
+export const GlobalContext = createContext<any>("");
+
+export const GlobalProvider = (props: any) => {
+  const [user, setUser] = useState<any>(
+    JSON.parse(sessionStorage.getItem("user")!!)
+  );
+  return (
+    <GlobalContext.Provider value={{ user: user, setUser }}>
+      {props.children}
+    </GlobalContext.Provider>
+  );
+};

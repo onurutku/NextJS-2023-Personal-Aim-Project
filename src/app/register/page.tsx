@@ -39,9 +39,7 @@ export default function Register() {
       body: JSON.stringify(data),
     });
     const response = await request.json().then((data: any) => {
-      sessionStorage.setItem("user", JSON.stringify(data));
-      document.cookie = `auth=${JSON.stringify(data)}`;
-      router.replace("/");
+      router.replace("/login");
     });
     return response;
   };
