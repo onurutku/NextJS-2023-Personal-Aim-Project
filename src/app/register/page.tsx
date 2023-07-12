@@ -5,9 +5,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as Yup from "yup";
 import User from "@/models/register.model";
 import { useRouter } from "next/navigation";
-
+import { postUser, getAllUsers } from "@/services/user.service";
+import { useState } from "react";
 export default function Register() {
+  const [emailAlreadyTaken, setMessage] = useState<string>("");
   const router = useRouter();
+
   const validationSchema = Yup.object()
     .shape({
       name: Yup.string().required("Name field is requeired"),
@@ -25,27 +28,26 @@ export default function Register() {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: yupResolver(validationSchema),
     mode: "onTouched",
   });
   const onSubmit = async (data: User) => {
-    const request = await fetch("http://localhost:3000/users", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
-    const response = await request.json().then((data: any) => {
-      router.replace("/login");
-    });
-    return response;
+    const allUsers: User[] = await getAllUsers();
+    for (let i = 0; i < allUsers.length; i++) {
+      if (allUsers[i].email === data.email) {
+        setMessage("This email address has already taken");
+        return;
+      }
+    }
+    return await postUser(data).then(() => router.replace("/login"));
   };
-  async function emaillo(name: string) {
-    return false;
-  }
+  const clearMessage = (e: any) => {
+    if (e.target.value === "") {
+      setMessage("");
+    }
+  };
   return (
     <>
       {/* imported style page usage*/}
@@ -62,7 +64,7 @@ export default function Register() {
                 className="form-control"
                 id="exampleNameInput"
                 aria-describedby="emailHelp"
-                {...register("name", { validate: emaillo })}
+                {...register("name")}
               />
               <div className="text-danger ms-1 mt-1">
                 {errors.name?.message}
@@ -78,10 +80,14 @@ export default function Register() {
                 id="exampleInputEmail1"
                 aria-describedby="emailHelp"
                 {...register("email")}
+                onChange={clearMessage}
               />
               <div className="text-danger ms-1 mt-1">
                 {errors.email?.message}
               </div>
+              {emailAlreadyTaken ? (
+                <div className="text-danger ms-1 mt-1">{emailAlreadyTaken}</div>
+              ) : null}
             </div>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
@@ -113,7 +119,11 @@ export default function Register() {
                 {errors.repassword?.message}
               </div>
             </div>
-            <button type="submit" className="btn btn-sm btn-primary float-end">
+            <button
+              disabled={!isValid}
+              type="submit"
+              className="btn btn-sm btn-primary float-end"
+            >
               Sign Up
             </button>
           </form>
