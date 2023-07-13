@@ -9,6 +9,7 @@ import { postUser, getAllUsers } from "@/services/user.service";
 import { useState } from "react";
 export default function Register() {
   const [emailAlreadyTaken, setMessage] = useState<string>("");
+  const [spinnerFlag, setSpinnerFlag] = useState<boolean>(false);
   const router = useRouter();
 
   const validationSchema = Yup.object()
@@ -34,14 +35,18 @@ export default function Register() {
     mode: "onTouched",
   });
   const onSubmit = async (data: User) => {
+    setSpinnerFlag(true);
     const allUsers: User[] = await getAllUsers();
     for (let i = 0; i < allUsers.length; i++) {
       if (allUsers[i].email === data.email) {
         setMessage("This email address has already taken");
+        setSpinnerFlag(false);
         return;
       }
     }
-    return await postUser(data).then(() => router.replace("/login"));
+    await postUser(data);
+    router.replace("/login");
+    setSpinnerFlag(false);
   };
   const clearMessage = (e: any) => {
     if (e.target.value === "") {
@@ -120,11 +125,18 @@ export default function Register() {
               </div>
             </div>
             <button
-              disabled={!isValid}
+              disabled={!isValid || spinnerFlag}
               type="submit"
               className="btn btn-sm btn-primary float-end"
             >
               Sign Up
+              {!spinnerFlag || (
+                <span
+                  className="spinner-border spinner-border-sm ms-2"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              )}
             </button>
           </form>
         </div>

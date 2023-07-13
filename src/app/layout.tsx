@@ -3,6 +3,8 @@ import "./globals.css";
 import "node_modules/bootstrap/dist/css/bootstrap.min.css"; // Bootstrap css kalıtımıyla buradan tüm child componentlere iletiliyor
 import Footer from "@/components/footer/footer";
 import { GlobalProvider } from "@/contexts";
+import "react-toastify/dist/ReactToastify.css";
+import { ToastContainer } from "react-toastify";
 
 export const metadata = {
   title: "Create Next App",
@@ -28,6 +30,7 @@ export default function RootLayout({
         >
           <Footer />
         </footer>
+        <ToastContainer />
       </body>
     </html>
   );

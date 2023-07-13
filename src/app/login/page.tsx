@@ -4,6 +4,7 @@ import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 import User from "@/models/register.model";
 import { GlobalContext } from "@/contexts";
+import { getAllUsers } from "@/services/user.service";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -12,13 +13,14 @@ export default function Login() {
   const router = useRouter();
 
   const checkUser = async (user: User) => {
-    const request = await fetch("http://localhost:3000/users");
-    const data: User[] = await request.json();
-    const matched: User | undefined = data.find(
+    const allUsers: User[] = await getAllUsers();
+    const matched: User | undefined = allUsers.find(
       (element: User) =>
         element.email === user.email && element.password === user.password
     );
-    setUserToMemory(matched);
+    if (matched) {
+      setUserToMemory(matched);
+    }
     return matched;
   };
   const setUserToMemory = (matched: User | undefined) => {
