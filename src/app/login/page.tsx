@@ -4,7 +4,7 @@ import styles from "./page.module.css";
 import { useRouter } from "next/navigation";
 import User from "@/models/register.model";
 import { GlobalContext } from "@/contexts";
-import { getAllUsers } from "@/services/user.service";
+import { checkUser } from "@/services/user.service";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -12,12 +12,8 @@ export default function Login() {
   const { user, setUser } = useContext(GlobalContext);
   const router = useRouter();
 
-  const checkUser = async (user: User) => {
-    const allUsers: User[] = await getAllUsers();
-    const matched: User | undefined = allUsers.find(
-      (element: User) =>
-        element.email === user.email && element.password === user.password
-    );
+  const checkUserLog = async (user: User) => {
+    const matched = await checkUser(user);
     if (matched) {
       setUserToMemory(matched);
     }
@@ -34,7 +30,7 @@ export default function Login() {
       email: email,
       password: password,
     };
-    (await checkUser(user)) ? router.replace("/") : router.refresh();
+    (await checkUserLog(user)) ? router.replace("/") : router.refresh();
   };
   const emailChange = (e: any) => {
     e.preventDefault();

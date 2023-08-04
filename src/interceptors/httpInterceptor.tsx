@@ -1,8 +1,9 @@
 import axios from "axios";
 import { toast } from "react-toastify";
+import { baseUrl } from "@/models/constants.model";
 
 const httpInterceptor = axios.create({
-  baseURL: "http://localhost:3000/", // Replace with your API base URL
+  baseURL: baseUrl, // Replace with your API base URL
 });
 httpInterceptor.interceptors.response.use(
   (response: any) => {
