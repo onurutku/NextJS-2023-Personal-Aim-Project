@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import User from "@/models/register.model";
 import { GlobalContext } from "@/contexts";
 import { checkUser } from "@/services/user.service";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [email, setEmail] = useState<string>("");
@@ -12,35 +13,40 @@ export default function Login() {
   const { user, setUser } = useContext(GlobalContext);
   const router = useRouter();
 
-  const checkUserLog = async (user: User) => {
-    const matched = await checkUser(user);
-    if (matched) {
-      setUserToMemory(matched);
-    }
-    return matched;
-  };
   const setUserToMemory = (matched: User | undefined) => {
     document.cookie = `auth=${JSON.stringify(matched)}`;
     sessionStorage.setItem("user", JSON.stringify(matched));
     setUser(matched);
   };
+
   const handleSubmit = async (event: any) => {
     event.preventDefault();
     const user: User = {
       email: email,
       password: password,
     };
-    (await checkUserLog(user)) ? router.replace("/") : router.refresh();
+    const isUserExist = await checkUser(user);
+    toast(isUserExist.message, {
+      hideProgressBar: true,
+      autoClose: 2000,
+      type: isUserExist.type,
+    });
+    if (isUserExist.user) {
+      setUserToMemory(isUserExist.user);
+      router.replace("/");
+    } else {
+      router.refresh();
+    }
   };
-  const emailChange = (e: any) => {
+
+  const emailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setEmail(e.target.value);
   };
-  const passwordChange = (e: any) => {
+  const passwordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.preventDefault();
     setPassword(e.target.value);
   };
-
   return (
     <>
       {/* imported style page usage*/}
@@ -59,10 +65,8 @@ export default function Login() {
                 aria-describedby="emailHelp"
                 onChange={emailChange}
                 value={email}
+                required={true}
               />
-              <div className="text-danger ms-1 mt-1">
-                {/* {errors.email?.message} */}
-              </div>
             </div>
             <div className="mb-3">
               <label htmlFor="password" className="form-label">
@@ -74,12 +78,8 @@ export default function Login() {
                 id="password"
                 onChange={passwordChange}
                 value={password}
+                required={true}
               />
-              <div className="text-danger ms-1 mt-1">
-                {/* {errors.password
-                  ? "Password should contains at least an uppercase,an lowercase and eight characters"
-                  : ""} */}
-              </div>
             </div>
             <button type="submit" className="btn btn-sm btn-primary float-end">
               Login

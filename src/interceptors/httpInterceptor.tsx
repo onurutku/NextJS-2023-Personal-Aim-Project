@@ -1,21 +1,17 @@
-import axios from "axios";
+import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { baseUrl } from "@/models/constants.model";
 
 const httpInterceptor = axios.create({
   baseURL: baseUrl, // Replace with your API base URL
 });
+
+//Error Interceptor
 httpInterceptor.interceptors.response.use(
-  (response: any) => {
-    toast(`Success! - ${response.statusText} , ${response.status}`, {
-      hideProgressBar: true,
-      autoClose: 2000,
-      type: "success",
-    });
+  (response: AxiosResponse) => {
     return response;
   },
-  (error: any) => {
-    console.log(error);
+  (error: AxiosError) => {
     toast(`Error! - ${error.message} , ${error.code}`, {
       hideProgressBar: true,
       autoClose: 2000,
